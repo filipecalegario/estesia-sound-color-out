@@ -1,6 +1,9 @@
-Projeto baseado no [rhizome](https://github.com/sebpiq/rhizome) usado no espetáculo Estesia.
-Os celulares da plateia se conectam ao computador que está rodando o servidor do rhizome e comandos MIDI disparam samples nesse celular.
-A plateia então se torna uma grande propagadora de massa sonora formada por várias caixas individuais.
+Estesia Sound Color Out
+--------------
+
+Projeto baseado no [rhizome](https://github.com/sebpiq/rhizome) usado no espetáculo estesia+batebit.
+
+Os celulares da plateia se conectam ao computador que está rodando o servidor do rhizome e comandos MIDI do computador disparam samples nesse celular. A plateia então se torna uma grande propagadora de massa sonora formada pelos alto-falantes dos celulares.
 
 Instruções
 --------------
