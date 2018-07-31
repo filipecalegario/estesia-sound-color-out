@@ -1,0 +1,229 @@
+<!doctype html>
+<html class="no-js">
+
+<head>
+  <meta charset="utf-8">
+  <title>metronome</title>
+  <meta name="description" content="">
+  <meta name="author" content="Fredrik Olofsson">
+  <meta name="viewport" content="width=device-width">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div id="message">
+    <font color="white" face="verdana" size="3">Waiting...</font>
+  </div>
+  <div id="metro">
+    <canvas id="canvas" width="320" height="240"></canvas>
+  </div>
+
+  <script src="/rhizome/rhizome.js"></script>
+  <!-- <script src="./scripts/Tone.js"></script>
+  <script src="./scripts/jquery.min.js"></script>
+  <script src="./scripts/draggabilly.js"></script>
+  <script src="./scripts/StartAudioContext.js"></script>
+  <script src="./scripts/Interface.js"></script>
+  <script src="./scripts/Keyboard.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.13/howler.js"></script>-->
+  <script src="./scripts/howler.js"></script>
+  <script src="./scripts/NoSleep.js"></script>
+  <script>
+    (function () {
+      // Window dimensions, ref : 
+      // http://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window
+      var w = window, d = document, e = d.documentElement, g = d.getElementsByTagName('body')[0]
+        , winWidth = w.innerWidth || e.clientWidth || g.clientWidth
+        , winHeight = w.innerHeight || e.clientHeight || g.clientHeight
+        , fontSize = winWidth * 0.1
+
+      var ctx
+        , maxBars = 100
+        , maxBeat = 3
+        , can
+        , client = new rhizome.Client()
+
+      // var synth = new Tone.PolySynth(3, Tone.Synth, {
+      //   "oscillator": {
+      //     "type": "fatsawtooth",
+      //     "count": 3,
+      //     "spread": 30
+      //   },
+      //   "envelope": {
+      //     "attack": 0.01,
+      //     "decay": 0.1,
+      //     "sustain": 0.5,
+      //     "release": 0.4,
+      //     "attackCurve": "exponential"
+      //   },
+      // }).toMaster();
+
+      let isAutoplay = false;
+      let isLoopable = false;
+      let loops = [];
+      let audios = [
+        './audio/sample1.mp3',
+        './audio/sample2.mp3',
+        './audio/sample3.mp3',
+        './audio/sample4.mp3',
+        './audio/C2.mp3',
+        './audio/sample6.mp3',
+      ];
+
+      for (let i = 0; i < 6; i++) {
+        loops[i] = new Howl({
+          src: audios[i],
+          autoplay: isAutoplay,
+          loop: isLoopable,
+          volume: 1.0,
+        });
+      }
+
+      /* const audio1 = new Howl({
+        src: audios[0],
+        autoplay: isAutoplay,
+        loop: isLoopable,
+        volume: 1.0,
+      });
+
+      const audio2 = new Howl({
+        src: audios[1],
+        autoplay: isAutoplay,
+        loop: isLoopable,
+        volume: 1.0,
+      });
+
+      const audio3 = new Howl({
+        src: audios[2],
+        autoplay: isAutoplay,
+        loop: isLoopable,
+        volume: 1.0,
+      });
+
+      const audio4 = new Howl({
+        src: audios[3],
+        autoplay: isAutoplay,
+        loop: isLoopable,
+        volume: 1.0,
+      });
+
+      const audio5 = new Howl({
+        src: audios[4],
+        autoplay: isAutoplay,
+        loop: isLoopable,
+        volume: 1.0,
+      });
+
+      const audio6 = new Howl({
+        src: audios[5],
+        autoplay: isAutoplay,
+        loop: isLoopable,
+        volume: 1.0,
+      }); */
+
+
+      // loops[0] = audio1;
+      // loops[1] = audio2;
+      // loops[2] = audio3;
+      // loops[3] = audio4;
+      // loops[4] = audio5;
+      // loops[5] = audio6;
+
+      var noSleep = new NoSleep();
+
+      function enableNoSleep() {
+        noSleep.enable();
+        document.removeEventListener('touchstart', enableNoSleep, false);
+      }
+
+      var ctxInit = function () {
+        can = document.getElementById('canvas')
+        //can.setAttribute('width', winWidth)
+        //can.setAttribute('height', winHeight)
+        ctx = can.getContext('2d')
+        ctx.font = '' + fontSize + 'px sans-serif'
+        document.addEventListener('touchstart', enableNoSleep, false);
+      }
+
+      var ctxClear = function () {
+        ctx.clearRect(0, 0, can.width, can.height)
+      }
+
+      var ctxMetro = function (bar, beat) {
+        var x, r
+        ctxClear()
+        if (beat < 6) {
+          loops[beat].play();
+        }
+        // =================================
+        switch (beat) {
+          case 0:
+            ctx.fillStyle = 'blue'
+            break;
+          case 1:
+            ctx.fillStyle = 'red'
+            break;
+          case 2:
+            ctx.fillStyle = 'green'
+            break;
+          case 3:
+            ctx.fillStyle = 'yellow'
+            break;
+          case 4:
+            ctx.fillStyle = 'pink'
+            break;
+          case 5:
+            ctx.fillStyle = 'brown'
+            break;
+          default:
+            text = "I have never heard of that fruit...";
+        }
+        // =================================
+
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      console.log('metro starting....')
+
+      client.start(function (err) {
+        if (err) throw err
+        console.log('metro subscribing...')
+        client.send('/sys/subscribe', ['/metro'])
+        client.send('/sys/subscribe', ['/reset'])
+        client.send('/sys/subscribe', ['/configure'])
+        client.send('/sys/resend', ['/configure']) // Reinitialize with previous parameters
+      })
+
+      client.on('message', function (addr, args) {
+
+        console.log('received:', addr, args)
+
+        // Updating the metronome
+        if (addr === '/metro') {
+          document.getElementById('message').innerHTML = "";
+          var bar = args[0]
+          var beat = args[1]
+          ctxMetro(bar, beat)
+        }
+
+        // Configure `maxBars` and `maxBeats`
+        else if (addr === '/configure') {
+          maxBars = args[0] || 100
+          maxBeat = args[1] || 3
+          console.log('setting maxBars to ' + maxBars + ' and maxBeat to ' + maxBeat)
+        }
+      })
+
+      client.on('connected', function () { console.log('metro connected') })
+
+
+
+      ctxInit()
+    })();
+
+  </script>
+</body>
+
+</html>
