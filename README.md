@@ -10,7 +10,7 @@ Instruções
 
 - abrir o Terminal e `cd` para este diretório
 - começar o servidor rhizome com: `rhizome config.js`
-- abrir um browser e abrir o endereço `http://localhost:8000`
+- abrir em um browser: `http://localhost:8000`
 - rodar o max com o `metronome_batebit.maxpat` que faz a conversão de MIDI para OSC pro rhizome
 
 para evitar que o usuário tenha de colocar o número da porta, pode-se usar a porta 80 que é a padrão para requisições http.
